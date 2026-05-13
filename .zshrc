@@ -42,6 +42,9 @@ dev-upgrade() {
   echo "\n🌱 Upgrading Mintlify"
   npm i -g mint@latest
 
+  echo "\n🐱 Upgrading GitHub CLI"
+  brew upgrade gh
+
   echo "\n✅ Versions"
   echo "  📦 node:     $(node -v)"
   echo "  📦 npm:      $(npm -v)"
@@ -53,6 +56,7 @@ dev-upgrade() {
   echo "  🐙 copilot:  $(copilot --version 2>&1 | head -1)"
   echo "  ✨ gemini:   $(gemini --version)"
   echo "  🌱 mint:     $(mint --version)"
+  echo "  🐱 gh:       $(gh --version | head -1)"
   echo "\n🎉 Done!"
 }
 alias dup="dev-upgrade"
