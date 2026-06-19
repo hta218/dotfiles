@@ -9,9 +9,10 @@ Personal configuration files for macOS development environment.
 
 ```
 .
-├── .claude/         # Claude Code settings
-├── .copilot/        # Copilot settings
-├── .opencode/       # Opencode settings and agent rules
+├── .agent/          # Shared agent rules & skills (single source of truth)
+├── .claude/         # Claude Code specific settings
+├── .copilot/        # Copilot specific settings
+├── .opencode/       # Opencode specific settings
 ├── .vscode/         # VS Code settings
 ├── .zshrc           # Zsh shell configuration
 └── .editorconfig     # Editor formatting defaults
