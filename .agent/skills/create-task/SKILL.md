@@ -49,7 +49,7 @@ Ask these in a single question block if possible:
    gh api repos/<owner>/<repo>/collaborators --jq '.[].login'
    Let user select from the list. Allow multiple selections. Include an "Unassigned" option.
 
-4. **Description/Body** - Ask for the issue body content (free text). If user provides `$ARGUMENTS`, pre-fill from that. This is the **raw/brief** content that will be enhanced in the next step.
+4. **Description/Body** - Ask for the issue body content (free text). If user provides `$ARGUMENTS`, pre-fill from that. This is the **raw/brief** content that will be cleaned up (not padded) in the next step.
 
 5. **Content Style Instructions** - Ask the user for custom guidelines on how to rewrite/enhance the description (free text). Examples:
    - "use checkboxes for action items"
@@ -61,9 +61,9 @@ Ask these in a single question block if possible:
 
    This is a single free-text field where the user writes their style preferences.
 
-### Step 4: Enhance the title and description
+### Step 4: Clean up the title and description (stay minimal)
 
-The raw title and description from Step 3 are just brief/rough inputs. Before creating the issue, **rewrite and enhance both** following best practices and the user's content style instructions.
+The raw title and description from Step 3 are brief/rough inputs. Before creating the issue, clean them up and apply the user's content style instructions. **Do NOT pad the description out.**
 
 **Title:**
 - Fix any grammar errors, typos, or awkward phrasing
@@ -71,11 +71,14 @@ The raw title and description from Step 3 are just brief/rough inputs. Before cr
 - Follow GitHub issue title conventions (imperative mood, descriptive but short)
 
 **Description:**
-- Use the raw description as the source material
-- Apply all the style guidelines the user provided
-- Produce a well-structured, clear, professional GitHub issue body
+- Lightly clean it up (grammar, clarity, formatting) — stick to what the user actually provided
+- **Only include sections that the user's input actually supports.** If they gave a Description and Steps to Reproduce, output exactly those two sections — nothing more
+- **Do NOT invent or auto-add boilerplate sections** (e.g. Expected Behavior, Actual Behavior, Environment, Possible Cause, Root Cause, Acceptance Criteria, Impact) unless the user's raw input or their content-style instructions explicitly call for them
+- **Do NOT fabricate details** the user didn't give (repro steps, environment values, causes, criteria). No filler, no guessing
+- Keep it short. When in doubt, fewer sections is better
+- Apply any style guidelines the user provided
 
-Do NOT ask the user for approval of the rewritten content -- just apply the enhancements and proceed.
+Do NOT ask the user for approval of the cleaned-up content -- just apply the changes and proceed.
 
 ### Step 5: Ask for metadata
 
@@ -111,7 +114,7 @@ gh issue create \
   --label "<label1>,<label2>" \
   --milestone "<milestone>"
 
-Use a heredoc for the body to preserve formatting. Use the **enhanced description** from Step 4 (not the raw input from Step 3):
+Use a heredoc for the body to preserve formatting. Use the **cleaned-up description** from Step 4 (not the raw input from Step 3):
 gh issue create --repo <owner>/<repo> --title "<title>" --assignee "<assignees>" --body "$(cat <<'EOF'
 <body content>
 EOF
@@ -173,3 +176,4 @@ Output a summary of what was created:
 - Use the project's internal IDs (from `field-list`) for `item-edit` commands, not display names.
 - The `--project` flag on `gh issue create` does NOT set project field values -- you must use `gh project item-add` + `gh project item-edit` separately.
 - For issue body, always use heredoc syntax to preserve multiline formatting.
+- Keep issue descriptions minimal. Only include sections backed by what the user actually provided. Never auto-add boilerplate sections (Expected/Actual Behavior, Environment, Possible/Root Cause, Acceptance Criteria, Impact) or fabricate details unless the user asks for them.
