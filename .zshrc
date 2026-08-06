@@ -14,49 +14,46 @@ export PATH=$HOME/.opencode/bin:$PATH
 alias oc='opencode'
 
 
-# Upgrade dev environment: node (nvm), biome, opencode, claude code
+# Upgrade dev environment: npm globals, opencode, claude code, brew CLIs
+# Note: Node itself is NOT upgraded here — do that manually with `nvm install node`
 dev-upgrade() {
+  _has() { command -v "$1" >/dev/null 2>&1 }
+  _ver() { _has "$1" && "$@" 2>&1 | head -1 || echo "not installed" }
+
   echo "🚀 Upgrading dev environment...\n"
 
-  echo "📦 Upgrading Node via nvm"
-  nvm install node --reinstall-packages-from=current --latest-npm && nvm use node && nvm alias default node
+  echo "📦 Upgrading npm globals (bun, pnpm, biome, gemini)"
+  npm i -g bun@latest pnpm@latest @biomejs/biome@latest @google/gemini-cli@latest
 
-  echo "\n🍞 Upgrading bun & pnpm"
-  npm i -g bun@latest pnpm@latest
-
-  echo "\n🌿 Upgrading global Biome"
-  npm i -g @biomejs/biome@latest
-
-  echo "\n🤖 Upgrading opencode"
-  opencode upgrade
-
-  echo "\n🧠 Upgrading Claude Code"
-  claude update
-
-  echo "\n🐙 Upgrading GitHub Copilot CLI"
-  copilot update
-
-  echo "\n✨ Upgrading Gemini CLI"
-  npm i -g @google/gemini-cli@latest
-
+  # mint is installed on its own: it pulls puppeteer, whose postinstall is
+  # flaky, and a failure there would abort the whole npm command above
   echo "\n🌱 Upgrading Mintlify"
-  npm i -g mint@latest
+  npm i -g mint@latest || echo "⚠️  mint upgrade failed — skipped"
+
+  _has opencode && { echo "\n🤖 Upgrading opencode"; opencode upgrade; }
+  _has claude   && { echo "\n🧠 Upgrading Claude Code"; claude update; }
+
+  # copilot self-updates in place (the brew cask `copilot-cli` lags behind,
+  # so `brew upgrade --cask copilot-cli` would roll it back)
+  _has copilot && { echo "\n🐙 Upgrading GitHub Copilot CLI"; copilot update; }
 
   echo "\n🐱 Upgrading GitHub CLI"
   brew upgrade gh
 
   echo "\n✅ Versions"
-  echo "  📦 node:     $(node -v)"
-  echo "  📦 npm:      $(npm -v)"
-  echo "  🍞 bun:      $(bun --version)"
-  echo "  📦 pnpm:     $(pnpm --version)"
-  echo "  🌿 biome:    $(biome --version)"
-  echo "  🤖 opencode: $(opencode --version)"
-  echo "  🧠 claude:   $(claude --version)"
-  echo "  🐙 copilot:  $(copilot --version 2>&1 | head -1)"
-  echo "  ✨ gemini:   $(gemini --version)"
-  echo "  🌱 mint:     $(mint --version)"
-  echo "  🐱 gh:       $(gh --version | head -1)"
+  echo "  📦 node:     $(_ver node -v)"
+  echo "  📦 npm:      $(_ver npm -v)"
+  echo "  🍞 bun:      $(_ver bun --version)"
+  echo "  📦 pnpm:     $(_ver pnpm --version)"
+  echo "  🌿 biome:    $(_ver biome --version)"
+  echo "  🤖 opencode: $(_ver opencode --version)"
+  echo "  🧠 claude:   $(_ver claude --version)"
+  echo "  🐙 copilot:  $(_ver copilot --version)"
+  echo "  ✨ gemini:   $(_ver gemini --version)"
+  echo "  🌱 mint:     $(_ver mint --version)"
+  echo "  🐱 gh:       $(_ver gh --version)"
   echo "\n🎉 Done!"
+
+  unset -f _has _ver
 }
 alias dup="dev-upgrade"
