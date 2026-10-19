@@ -18,6 +18,15 @@ Look back through the conversation history and identify all code changes that we
 
 If `$ARGUMENTS` is provided, focus the explanation on that specific area or answer that specific question about the changes.
 
+### Step 1.5: TL;DR first
+
+Open the explanation with a short **TL;DR** block before any detail, so the reader gets the gist in ~10 seconds:
+- **Before:** one line on how things worked / the problem.
+- **After:** what changed, as 2-5 short bullets (numbered conditions if it is a gate or flow).
+- **⚠️ Watch out:** 1-3 bullets on gotchas, prerequisites, or what is NOT covered.
+
+Max ~10 lines. No code snippets, no tables. Then continue with the detailed steps below.
+
 ### Step 2: Explain — What did you do?
 
 List every change that was made, file by file. For each file:
